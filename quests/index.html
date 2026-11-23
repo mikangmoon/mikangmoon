@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quest Log: All Projects — Mikang Moon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Geist+Pixel&display=swap" rel="stylesheet">
+<style>
+
+/* Night-time Frutiger Aero: one fixed theme, so tokens are not remapped for light/dark */
+:root{
+  --night:#050F3A; --navy:#06185A; --blue:#0032DB; --aero:#0689E4; --picton:#00BFFF; --sky:#87CEEB;
+  --mint:#90EE90; --lime:#32CD32; --silver:#C0C8D0; --pink:#FFF0F8; --aqua:#E8F8FF;
+  --ink:#0B2A6B; --sub:#3A4F8A; --accent:#FFE74C; --vermilion:#FF4000;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-behavior:smooth; scroll-padding-top:env(safe-area-inset-top,0px);}
+body{margin:0; background:var(--navy); color:var(--ink); font-family:'VT323',monospace; font-size:1rem; overflow-x:hidden;}
+.pixel{font-family:'Press Start 2P',monospace;}
+.read,.read-title{font-family:'Geist Pixel',ui-monospace,monospace; font-variation-settings:"ELSH" 1; font-weight:400;}
+.read{font-size:1rem; line-height:1.6;}
+.read-title{font-size:clamp(1.125rem,1rem + .5vw,1.375rem); line-height:1.3;}
+/* Responsive type: body copy is 1rem (16px, follows the visitor's browser text size); headings and pixel labels scale fluidly with the viewport */
+.text-lg,.text-xl{font-size:1rem !important; line-height:1.6 !important;}
+h1.pixel{font-size:clamp(1.25rem,1rem + 1.2vw,1.75rem) !important; line-height:1.5 !important;}
+h2.pixel{font-size:clamp(1.125rem,1rem + .8vw,1.5rem) !important;}
+.text-\[10px\],.text-\[11px\],.win-name,.badge-done{font-size:clamp(10px,.55rem + .35vw,12px) !important;}
+footer p.pixel{font-size:clamp(12px,.7rem + .4vw,14px) !important;}
+img,.pixel-render{image-rendering:pixelated; image-rendering:crisp-edges;}
+::selection{background:var(--accent); color:var(--navy);}
+:focus-visible{outline:3px solid #fff; outline-offset:2px; box-shadow:0 0 0 6px var(--blue);}
+
+/* Windows-style popup */
+.win{background:var(--pink); border:4px solid var(--navy); border-radius:6px; overflow:hidden;
+  box-shadow:0 0 0 3px var(--sky), 0 0 0 5px #fff, 8px 10px 0 rgba(0,0,0,.35);}
+.win-title{display:flex; align-items:center; gap:10px; padding:8px 10px; color:var(--navy);
+  background:linear-gradient(#8BE3FF,#3DB6F5 60%,#1AA3F2);}
+.win-icon{width:16px; height:16px; background:#fff; border:3px solid var(--navy); flex:none;}
+.win-name{font-family:'Press Start 2P',monospace; font-size:10px; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.win-ctrls{display:flex; gap:4px; flex:none;}
+.win-ctrls i{display:block; width:22px; height:20px; border:2px solid var(--navy); font:700 13px/16px system-ui,sans-serif; font-style:normal; text-align:center; color:var(--navy);
+  background:linear-gradient(#fff,var(--silver));}
+.win-ctrls i.x{background:linear-gradient(#FF7A4D,var(--vermilion)); color:#fff;}
+.win-bar{display:flex; align-items:center; gap:10px; padding:6px 10px; border-top:3px solid var(--navy); border-bottom:3px solid var(--navy);
+  background:linear-gradient(#C8F76A,#5FD83A 55%,var(--lime)); color:#0B5A2A;}
+.win-bar .tb{font:700 14px system-ui,sans-serif; letter-spacing:3px; flex:none;}
+.addr{flex:1; min-width:0; background:#fff; border:2px solid var(--navy); padding:0 8px; font-size:18px; color:#0B5A2A; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.win-body{padding:20px; background:var(--aqua);}
+.win-body.pink{background:var(--pink);}
+
+/* Frutiger Aero white pill tags (same style as the Data Driven Detroit method tags) */
+.chip{position:relative; overflow:hidden; display:inline-flex; align-items:center; justify-content:center; text-align:center; max-width:100%;
+  font-family:'VT323',monospace; font-size:16px; line-height:1.3; padding:7.2px 16.2px 9px; border-radius:999px;
+  color:#06185A; border:3px solid #1A8AD8; border-bottom-color:#0E73C2; background:linear-gradient(#FFFFFF,#F1F8FE 60%,#FFFFFF);
+  box-shadow:inset 0 -4px 0 #BFE9FF, 0 3px 8px rgba(30,140,220,.28);}
+.chip::before{content:""; position:absolute; left:8%; right:8%; top:2px; height:30%; border-radius:999px;
+  background:linear-gradient(rgba(255,255,255,.9),rgba(255,255,255,0)); pointer-events:none;}
+.badge-done{background:var(--accent); border:2px solid var(--navy); border-radius:6px; color:var(--navy); font-size:11px; padding:4px 10px;}
+
+/* Glossy aero buttons */
+.btn-arcade,.btn-green,.btn-ghost{font-family:'Press Start 2P',monospace; border:3px solid var(--navy); border-radius:999px; transition:transform .08s ease, box-shadow .08s ease;}
+.btn-arcade{font-size:12px; color:#fff; padding:12px 22px; box-shadow:0 5px 0 var(--night);
+  background:linear-gradient(rgba(255,255,255,.16) 50%,rgba(255,255,255,0) 50%),linear-gradient(#0047B3,var(--blue));}
+.btn-green{font-size:12px; color:var(--navy); padding:14px 26px; box-shadow:0 5px 0 #0B5A2A;
+  background:linear-gradient(rgba(255,255,255,.35) 50%,rgba(255,255,255,0) 50%),linear-gradient(#7CE85A,var(--lime));}
+.btn-ghost{font-size:10px; color:var(--ink); padding:9px 14px; box-shadow:0 4px 0 #6B7480; background:linear-gradient(#fff,var(--silver));}
+.btn-arcade:hover,.btn-green:hover,.btn-ghost:hover{transform:translateY(2px);}
+.btn-arcade:hover,.btn-green:hover{box-shadow:0 3px 0 var(--night);}
+.btn-arcade:active,.btn-green:active{transform:translateY(5px); box-shadow:0 0 0 transparent;}
+
+/* Scenery */
+.cloud{position:absolute; background:linear-gradient(#fff 60%,#BFE9FF); border:3px solid var(--sky); border-radius:40px; opacity:.92;}
+.star{position:absolute; color:var(--accent); font-size:14px; animation:twinkle 2.4s ease-in-out infinite;}
+@keyframes twinkle{0%,100%{opacity:.3} 50%{opacity:1}}
+@keyframes drift{to{transform:translateX(-40px)}}
+.parallax{animation:drift 14s ease-in-out infinite alternate;}
+.bubble{position:absolute; border-radius:50%; border:2px solid rgba(255,255,255,.65);
+  background:radial-gradient(circle at 30% 28%,rgba(255,255,255,.95),rgba(255,255,255,.2) 35%,rgba(0,191,255,.3) 72%);
+  animation:bob 6s ease-in-out infinite alternate;}
+@keyframes bob{to{transform:translateY(-18px)}}
+.hills{position:absolute; left:0; bottom:0; width:100%; height:96px; background:linear-gradient(#9CF58A,var(--lime) 35%,#1E8E2E);
+  clip-path:polygon(0 100%,0 62%,8% 62%,8% 46%,18% 46%,18% 30%,30% 30%,30% 46%,42% 46%,42% 62%,55% 62%,55% 40%,68% 40%,68% 24%,80% 24%,80% 46%,92% 46%,92% 62%,100% 62%,100% 100%);}
+.moon-glow{filter:drop-shadow(0 0 10px rgba(255,231,76,.85));}
+
+#cursor-dot{position:fixed; width:10px; height:10px; background:var(--accent); border:2px solid var(--navy); pointer-events:none; z-index:9999; transform:translate(-50%,-50%);}
+.trail{position:fixed; width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.8); border:1px solid var(--picton); pointer-events:none; z-index:9998; transform:translate(-50%,-50%);}
+@media (prefers-reduced-motion:reduce){ .parallax,.star,.bubble{animation:none !important;} .btn-arcade,.btn-green,.btn-ghost{transition:none !important;} }
+@media (hover:none){ #cursor-dot,.trail{display:none;} }
+
+/* Hero character + moon companion (/assets/character/): floating idle, hover/focus/tap to wave */
+.hero-buddy{position:relative; width:min(72vw,283px); aspect-ratio:566/700; cursor:pointer; margin-top:34px; border-radius:12px;}
+.char-float{position:absolute; inset:0; animation:buddyFloat 3.6s ease-in-out infinite;}
+.char{position:absolute; inset:0; width:100%; height:100%; image-rendering:pixelated; image-rendering:crisp-edges;}   /* keep the pixels sharp */
+.char.wave{opacity:0;}
+.hero-buddy:hover .char.idle,.hero-buddy:focus-within .char.idle,.hero-buddy.waving .char.idle{opacity:0;}
+.hero-buddy:hover .char.wave,.hero-buddy:focus-within .char.wave,.hero-buddy.waving .char.wave{opacity:1;}
+.moon-buddy{position:absolute; right:-27%; top:0%; width:41.3%; image-rendering:pixelated; image-rendering:crisp-edges; z-index:2; animation:moonFloat 4.6s ease-in-out infinite; filter:drop-shadow(0 0 10px rgba(255,231,76,.55));}
+.char-shadow{position:absolute; left:22%; right:22%; bottom:-6px; height:14px; border-radius:50%; background:rgba(5,15,58,.4); filter:blur(3px); animation:buddyShadow 3.6s ease-in-out infinite;}
+.buddy-bubble{position:absolute; left:-10%; top:-40px; z-index:3; background:#fff; color:#06185A; border:3px solid #06185A; border-radius:12px; padding:7px 10px;
+  font-family:'Press Start 2P',monospace; font-size:10px; line-height:1.4; white-space:nowrap; opacity:0; transform:translateY(6px); transition:opacity .15s ease, transform .15s ease; pointer-events:none;}
+.hero-buddy:hover .buddy-bubble,.hero-buddy:focus-within .buddy-bubble,.hero-buddy.waving .buddy-bubble{opacity:1; transform:none;}
+@keyframes buddyFloat{0%,100%{transform:translateY(0)} 50%{transform:translateY(-9px)}}
+@keyframes moonFloat{0%,100%{transform:translateY(0) rotate(-4deg)} 50%{transform:translateY(-13px) rotate(4deg)}}
+@keyframes buddyShadow{0%,100%{transform:scaleX(1); opacity:.45} 50%{transform:scaleX(.84); opacity:.28}}
+@media (prefers-reduced-motion:reduce){ .char-float,.moon-buddy,.char-shadow{animation:none !important;} .buddy-bubble{transition:none;} }
+
+/* Project card mockup image: same box size for every project, image centered and fully visible */
+.card-img{height:230px; display:flex; align-items:center; justify-content:center; margin:0 0 16px; padding:10px; border:3px solid var(--navy); border-radius:8px; background:linear-gradient(#E8F8FF,#CFEFFF);}
+.card-img img{max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain; image-rendering:auto; display:block; margin:0 auto;}
+.card-img.ph{border-style:dashed; flex-direction:column; gap:6px; text-align:center; background:#fff;}
+.card-img.ph b{font-family:'Press Start 2P',monospace; font-weight:400; font-size:10px; color:var(--blue);}
+/* Tags sit in 3 equal columns on every card */
+.chip-row{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin-bottom:16px;}
+.chip-row .chip{width:100%; padding-left:6px; padding-right:6px;}
+/* "Quest complete": glossy pill like the tags, in yellow */
+span.badge-done{position:relative; overflow:hidden; display:inline-flex; align-items:center; justify-content:center; font-family:'VT323',monospace; font-size:16px !important; line-height:1.3; padding:7.2px 16.2px 9px; border-radius:999px; color:#06185A;
+  border:3px solid #D4A800; border-bottom-color:#B88A00; background:linear-gradient(#FFF6A8,#FFE74C 55%,#FFE74C); box-shadow:inset 0 -4px 0 #FFF9C4, 0 3px 8px rgba(212,168,0,.35);}
+span.badge-done::before{content:""; position:absolute; left:8%; right:8%; top:2px; height:30%; border-radius:999px; background:linear-gradient(rgba(255,255,255,.9),rgba(255,255,255,0)); pointer-events:none;}
+/* Attributes text: +2px */
+ul.attr-list{font-size:18px !important; line-height:1.6 !important;}
+ul.attr-list .pixel{font-size:calc(clamp(10px,.55rem + .35vw,12px) + 2px) !important;}
+/* Pixel clouds */
+.cloud-px{position:absolute; image-rendering:pixelated; image-rendering:crisp-edges; opacity:.95;}
+/* Character link covers the whole character */
+.buddy-link{position:absolute; inset:0; z-index:5; border-radius:12px;}
+
+</style>
+<script>
+/* Always open a page at the very top, even when the visitor comes back to it (stops the browser from restoring the old scroll position) */
+(function(){
+  try{ if('scrollRestoration' in history) history.scrollRestoration='manual'; }catch(e){}
+  function toTop(){ if(!location.hash) window.scrollTo({top:0,left:0,behavior:'instant'}); }
+  toTop();
+  window.addEventListener('DOMContentLoaded',toTop);
+  window.addEventListener('load',function(){ toTop(); setTimeout(toTop,60); });
+  window.addEventListener('pageshow',function(e){ if(e.persisted) toTop(); });   // page restored from the back/forward cache
+})();
+</script>
+<meta name="description" content="Every UX research and design project by Mikang Moon, from mental health games to civic technology.">
+<meta name="theme-color" content="#050F3A">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Quest Log: All Projects — Mikang Moon">
+<meta property="og:description" content="Every UX research and design project by Mikang Moon, from mental health games to civic technology.">
+<link rel="icon" type="image/png" href="/assets/favicon.png">
+<link rel="stylesheet" href="/assets/css/tailwind.css">
+</head>
+<body class="min-h-screen">
+
+<nav class="relative z-40">
+  <div class="mx-3 mt-3 sm:mx-6 sm:mt-4 px-4 py-2 flex items-center justify-between" style="background:linear-gradient(rgba(255,255,255,.22) 50%,rgba(255,255,255,0) 50%),linear-gradient(#0A5FCC,#0047B3); border:4px solid var(--navy); border-radius:999px; box-shadow:0 0 0 3px var(--sky), 6px 6px 0 rgba(0,0,0,.35);">
+    <a href="/" aria-label="Home" class="block"><img src="/assets/img/shared/moon-df37c5.png" alt="" class="pixel-render moon-glow" style="width:45px;height:45px;object-fit:contain;"></a>
+    <div class="hidden sm:flex items-center gap-5 pixel text-[10px] text-white">
+      <a href="/" class="hover:opacity-70">HOME</a>
+      <a href="#top" class="hover:opacity-70" aria-current="page">QUESTS</a>
+      <a href="/about/" class="hover:opacity-70">ABOUT</a>
+      <a href="/contact/" class="hover:opacity-70">CONTACT</a>
+    </div>
+    <a href="/" class="btn-ghost sm:hidden">HOME</a>
+  </div>
+</nav>
+
+<main id="top">
+<div class="px-4 pt-10 pb-14" style="background:linear-gradient(#050F3A,#0A2A8A 35%,#06185A);">
+  <div class="max-w-5xl mx-auto">
+    <h2 class="sr-only">All quests</h2>
+    <div class="grid sm:grid-cols-2 gap-8">
+
+      <article class="win flex flex-col">
+        <div class="win-title"><span class="win-icon"></span><span class="win-name">QUEST_01.EXE</span><span class="win-ctrls" aria-hidden="true"><i>_</i><i>□</i><i class="x">×</i></span></div>
+        <div class="win-bar" aria-hidden="true"><span class="tb">◀ ▶ ⌂ ↻</span><span class="addr">mikang://quests/cozycorner</span></div>
+        <div class="win-body flex-1 flex flex-col">
+          <div class="card-img"><img src="/assets/img/shared/phone-mockups-of-the-cozycorner-app-7e3595.webp" alt="Phone mockups of the CozyCorner app"></div>
+          <span class="badge-done self-start mb-3">QUEST COMPLETE</span>
+          <h3 class="read-title mb-3">CozyCorner: Mental Health Companion</h3>
+          <p class="read mb-4 flex-1">A game-inspired mental health app designed to make emotional support more accessible and engaging for young adults. As Product Manager and UX Designer on a three-person team at Business+Tech Jam, I led the product vision and translated user research into wireframes and high-fidelity prototypes.</p>
+          <div class="chip-row"><span class="chip">Health Tech</span><span class="chip">UX Design</span><span class="chip">Mental Health</span></div>
+          <a href="/cozycorner/" class="btn-arcade text-center">VIEW QUEST</a>
+        </div>
+      </article>
+
+      <article class="win flex flex-col">
+        <div class="win-title"><span class="win-icon"></span><span class="win-name">QUEST_02.EXE</span><span class="win-ctrls" aria-hidden="true"><i>_</i><i>□</i><i class="x">×</i></span></div>
+        <div class="win-bar" aria-hidden="true"><span class="tb">◀ ▶ ⌂ ↻</span><span class="addr">mikang://quests/mbti-community-app</span></div>
+        <div class="win-body flex-1 flex flex-col">
+          <div class="card-img"><img src="/assets/img/shared/phone-mockups-of-the-mbti-community-455df2.webp" alt="Phone mockups of the MBTI Community App"></div>
+          <span class="badge-done self-start mb-3">QUEST COMPLETE</span>
+          <h3 class="read-title mb-3">MBTI Community App</h3>
+          <p class="read mb-4 flex-1">A personality-based social app designed to help young adults in urban environments discover meaningful connections and feel more confident attending social events. As the UX Designer, I led the end-to-end design process, translating user research into wireframes and a high-fidelity prototype centered on one question: “Who will be in the room?”</p>
+          <div class="chip-row"><span class="chip">Community App</span><span class="chip">Design Defense</span><span class="chip">Prototyping</span></div>
+          <a href="/mbti-community-app/" class="btn-arcade text-center">VIEW QUEST</a>
+        </div>
+      </article>
+
+      <article class="win flex flex-col">
+        <div class="win-title"><span class="win-icon"></span><span class="win-name">QUEST_03.EXE</span><span class="win-ctrls" aria-hidden="true"><i>_</i><i>□</i><i class="x">×</i></span></div>
+        <div class="win-bar" aria-hidden="true"><span class="tb">◀ ▶ ⌂ ↻</span><span class="addr">mikang://quests/cutgroup-proof-of-service</span></div>
+        <div class="win-body flex-1 flex flex-col">
+          <div class="card-img"><img src="/assets/img/shared/the-proof-of-service-court-form-04289e.webp" alt="The Proof of Service court form from the CUTGroup research project"></div>
+          <span class="badge-done self-start mb-3">QUEST COMPLETE</span>
+          <h3 class="read-title mb-3">Understanding Proof of Service</h3>
+          <p class="read mb-4 flex-1">As a user researcher, I led 6 of 10 usability sessions to find out why first-time filers get lost in a small claims court form.</p>
+          <div class="chip-row"><span class="chip">Legal Service Design</span><span class="chip">Usability Testing</span><span class="chip">Card Sorting</span></div>
+          <a href="/cutgroup-proof-of-service/" class="btn-arcade text-center">VIEW QUEST</a>
+        </div>
+      </article>
+
+      <article class="win flex flex-col">
+        <div class="win-title"><span class="win-icon"></span><span class="win-name">QUEST_04.EXE</span><span class="win-ctrls" aria-hidden="true"><i>_</i><i>□</i><i class="x">×</i></span></div>
+        <div class="win-bar" aria-hidden="true"><span class="tb">◀ ▶ ⌂ ↻</span><span class="addr">mikang://quests/state-of-the-detroit-child</span></div>
+        <div class="win-body flex-1 flex flex-col">
+          <div class="card-img"><img src="/assets/img/shared/a-laptop-showing-the-state-of-af57e0.webp" alt="A laptop showing the State of the Detroit Child website"></div>
+          <span class="badge-done self-start mb-3">QUEST COMPLETE</span>
+          <h3 class="read-title mb-3">Data Driven Detroit: UX Research Project</h3>
+          <p class="read mb-4 flex-1">How can a public data platform better support the people who rely on it? Through five UX research methods, from user interviews to usability testing, our team identified three key opportunities to improve data accessibility, navigation, and usability for Data Driven Detroit.</p>
+          <div class="chip-row"><span class="chip">Civic Tech</span><span class="chip">Consulting</span><span class="chip">Mixed Methods</span></div>
+          <a href="/data-driven-detroit/" class="btn-arcade text-center">VIEW QUEST</a>
+        </div>
+      </article>
+
+      <article class="win flex flex-col">
+        <div class="win-title"><span class="win-icon"></span><span class="win-name">QUEST_05.EXE</span><span class="win-ctrls" aria-hidden="true"><i>_</i><i>□</i><i class="x">×</i></span></div>
+        <div class="win-bar" aria-hidden="true"><span class="tb">◀ ▶ ⌂ ↻</span><span class="addr">mikang://quests/afb</span></div>
+        <div class="win-body flex-1 flex flex-col">
+          <div class="card-img ph" role="img" aria-label="Placeholder for a project image"><b>PROJECT IMAGE</b><span class="read" style="margin:0">Coming soon</span></div>
+          <span class="badge-done self-start mb-3">QUEST COMPLETE</span>
+          <h3 class="read-title mb-3">AFB: Small Business Website Evaluation</h3>
+          <p class="read mb-4 flex-1">A one-day UX consulting sprint for two Detroit small businesses. I ran heuristic evaluations and client communication, turning findings into actionable design recommendations.</p>
+          <p class="read mb-4" style="color:var(--sub)">This will take you to my old portfolio page.</p>
+          <div class="chip-row"><span class="chip">Heuristic Eval</span><span class="chip">Client UX</span><span class="chip">Small Business</span></div>
+          <a href="https://mikangmoon.webflow.io/projects/afb" class="btn-arcade text-center">VIEW QUEST</a>
+        </div>
+      </article>
+
+      <article class="win flex flex-col">
+        <div class="win-title"><span class="win-icon"></span><span class="win-name">QUEST_06.EXE</span><span class="win-ctrls" aria-hidden="true"><i>_</i><i>□</i><i class="x">×</i></span></div>
+        <div class="win-bar" aria-hidden="true"><span class="tb">◀ ▶ ⌂ ↻</span><span class="addr">mikang://quests/msu-tech</span></div>
+        <div class="win-body flex-1 flex flex-col">
+          <div class="card-img ph" role="img" aria-label="Placeholder for a project image"><b>PROJECT IMAGE</b><span class="read" style="margin:0">Coming soon</span></div>
+          <span class="badge-done self-start mb-3">QUEST COMPLETE</span>
+          <h3 class="read-title mb-3">Case Study: MSU Tech Website</h3>
+          <p class="read mb-4 flex-1">Evaluated how well MSU’s tech hub supports key tasks like resetting a NetID or finding events, using usability testing and interviews to uncover pain points and improvements.</p>
+          <p class="read mb-4" style="color:var(--sub)">This will take you to my old portfolio page.</p>
+          <div class="chip-row"><span class="chip">Usability Testing</span><span class="chip">UX Evaluation</span><span class="chip">User Interview</span></div>
+          <a href="https://mikangmoon.webflow.io/projects/msu-tech-website" class="btn-arcade text-center">VIEW QUEST</a>
+        </div>
+      </article>
+
+      <article class="win flex flex-col">
+        <div class="win-title"><span class="win-icon"></span><span class="win-name">QUEST_07.EXE</span><span class="win-ctrls" aria-hidden="true"><i>_</i><i>□</i><i class="x">×</i></span></div>
+        <div class="win-bar" aria-hidden="true"><span class="tb">◀ ▶ ⌂ ↻</span><span class="addr">mikang://quests/privacy</span></div>
+        <div class="win-body flex-1 flex flex-col">
+          <div class="card-img ph" role="img" aria-label="Placeholder for a project image"><b>PROJECT IMAGE</b><span class="read" style="margin:0">Coming soon</span></div>
+          <span class="badge-done self-start mb-3">QUEST COMPLETE</span>
+          <h3 class="read-title mb-3">Designing for Privacy</h3>
+          <p class="read mb-4 flex-1">With a team of four, I turned interview data from 40 tech users into personas, scenarios, and storyboards for tools that help people understand and protect their personal data.</p>
+          <p class="read mb-4" style="color:var(--sub)">This will take you to my old portfolio page.</p>
+          <div class="chip-row"><span class="chip">Contextual Design</span><span class="chip">Privacy</span><span class="chip">Personas</span></div>
+          <a href="https://mikangmoon.webflow.io/projects/designing-for-privacy" class="btn-arcade text-center">VIEW QUEST</a>
+        </div>
+      </article>
+
+    </div>
+    <div class="text-center mt-14"><a href="/" class="btn-green inline-block">BACK TO HOME</a></div>
+  </div>
+</div>
+</main>
+
+<footer id="footer" class="px-4 py-12" style="background:var(--night); border-top:4px solid var(--mint);">
+  <div class="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center sm:items-end gap-6 text-center sm:text-left">
+    <div>
+      <p class="pixel text-sm mb-3 text-white">MIKANG MOON</p>
+      <p class="text-xl"><a href="mailto:mikangs@umich.edu" class="underline" style="color:var(--accent)">mikangs@umich.edu</a></p>
+      <p class="text-xl" style="margin-top:6px"><a href="https://www.linkedin.com/in/mikangmoon" class="underline" style="color:var(--accent)">LinkedIn</a></p>
+    </div>
+    <div class="flex gap-4 pixel text-[10px] flex-wrap justify-center sm:justify-end text-white">
+      <a href="/" class="hover:opacity-70">HOME</a>
+      <a href="#top" class="hover:opacity-70">QUESTS</a>
+      <a href="/about/" class="hover:opacity-70">ABOUT</a>
+      <a href="/contact/" class="hover:opacity-70">CONTACT</a>
+    </div>
+  </div>
+</footer>
+
+<div id="cursor-dot"></div>
+<script>
+(function(){
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if(window.matchMedia('(hover: none)').matches) return;
+  var dot=document.getElementById('cursor-dot'), trails=[];
+  document.addEventListener('mousemove',function(e){
+    dot.style.left=e.clientX+'px'; dot.style.top=e.clientY+'px';
+    var t=document.createElement('div'); t.className='trail'; t.style.left=e.clientX+'px'; t.style.top=e.clientY+'px';
+    document.body.appendChild(t); trails.push(t);
+    setTimeout(function(){ t.remove(); trails.shift(); },300);
+    if(trails.length>12){ var o=trails.shift(); if(o) o.remove(); }
+  });
+})();
+</script>
+<script>
+/* ===== Project cards: scale + tilt on hover (same as the home page; transform only) =====
+   Finds the hovered card from the cards' fixed layout positions (unaffected by the tilt), listens on the page area instead of
+   the moving cards, and animates every frame, so the hover can't flicker. */
+(function(){
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches||window.matchMedia('(hover: none)').matches) return;
+  var section=document.querySelector('main'); if(!section) return;
+  var cards=[].slice.call(section.querySelectorAll('article.win')).map(function(el){ return {el:el,rx:0,ry:0,s:1,trx:0,try_:0,ts:1,focus:false}; });
+  var px=-1,py=-1,running=false;
+  function fixedRect(el){ var p=el.offsetParent.getBoundingClientRect(); return {l:p.left+el.offsetLeft,t:p.top+el.offsetTop,w:el.offsetWidth,h:el.offsetHeight}; }
+  function aim(){
+    cards.forEach(function(c){
+      var r=fixedRect(c.el), inside=px>=r.l&&px<=r.l+r.w&&py>=r.t&&py<=r.t+r.h;
+      if(inside){ c.ts=1.03; c.try_=((px-r.l)/r.w-.5)*6; c.trx=-((py-r.t)/r.h-.5)*6; }
+      else if(c.focus){ c.ts=1.03; c.try_=0; c.trx=0; }
+      else { c.ts=1; c.try_=0; c.trx=0; }
+    });
+    if(!running){ running=true; requestAnimationFrame(frame); }
+  }
+  function frame(){
+    var busy=false;
+    cards.forEach(function(c){
+      c.rx+=(c.trx-c.rx)*.16; c.ry+=(c.try_-c.ry)*.16; c.s+=(c.ts-c.s)*.16;
+      var settled=Math.abs(c.trx-c.rx)<.01&&Math.abs(c.try_-c.ry)<.01&&Math.abs(c.ts-c.s)<.0004;
+      if(settled&&c.ts===1&&c.trx===0){ c.el.style.transform=''; c.el.style.willChange=''; }
+      else{ busy=true; c.el.style.willChange='transform'; c.el.style.transform='perspective(1000px) rotateX('+c.rx.toFixed(2)+'deg) rotateY('+c.ry.toFixed(2)+'deg) scale('+c.s.toFixed(4)+')'; }
+    });
+    if(busy) requestAnimationFrame(frame); else running=false;
+  }
+  section.addEventListener('pointermove',function(e){ px=e.clientX; py=e.clientY; aim(); });
+  section.addEventListener('pointerleave',function(){ px=-1; py=-1; aim(); });
+  window.addEventListener('scroll',function(){ if(px>=0) aim(); },{passive:true});
+  cards.forEach(function(c){
+    c.el.addEventListener('focusin',function(){ c.focus=true; aim(); });
+    c.el.addEventListener('focusout',function(){ c.focus=false; aim(); });
+  });
+})();
+</script>
+</body>
+</html>
